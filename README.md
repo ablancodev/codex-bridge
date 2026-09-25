@@ -1,11 +1,11 @@
-# codex-bridge
+# @ablancodev/codex-bridge
 
 > Habla con Codex CLI desde tu app web. Usa tu **suscripción de ChatGPT** (login vía `codex login`), no la API de OpenAI. **Cero coste por token.**
 
 Como si llamaras a la API de OpenAI, pero apuntando a tu Codex local:
 
 ```js
-const { runCodex } = require('codex-bridge');
+const { runCodex } = require('@ablancodev/codex-bridge');
 
 const { answer, sessionId } = await runCodex({ prompt: 'Hola' });
 const { answer: a2 }        = await runCodex({ prompt: 'Y qué te pregunté?', sessionId });
@@ -19,6 +19,12 @@ const { answer: a2 }        = await runCodex({ prompt: 'Y qué te pregunté?', s
 ---
 
 ## Instalación
+
+```bash
+npm i @ablancodev/codex-bridge
+```
+
+O directamente desde GitHub sin publicar en npm:
 
 ```bash
 npm i github:ablancodev/codex-bridge
@@ -67,7 +73,7 @@ Rutas expuestas:
 
 ```js
 const http = require('http');
-const { createHandler } = require('codex-bridge');
+const { createHandler } = require('@ablancodev/codex-bridge');
 
 const codex = createHandler({
   basePath: '/api',

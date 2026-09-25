@@ -1,6 +1,8 @@
 {
-  "name": "codex-bridge",
+  "name": "@ablancodev/codex-bridge",
   "version": "0.1.0",
+  "publishConfig": { "access": "public" },
+  "author": "Antonio Blanco <antonio@blancoleon.com>",
   "description": "Chat con Codex CLI (suscripción ChatGPT, sin API) desde tu app. Multi-turno + MCPs por proyecto.",
   "main": "index.js",
   "files": ["index.js", "README.md"],

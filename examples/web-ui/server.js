@@ -1,7 +1,7 @@
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
-const { createHandler } = require('codex-bridge');
+const { createHandler } = require('@ablancodev/codex-bridge');
 
 const PORT = process.env.PORT || 5173;
 

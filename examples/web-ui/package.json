@@ -5,6 +5,6 @@
   "description": "Ejemplo mínimo: chat web multi-turno sobre codex-bridge.",
   "scripts": { "start": "node server.js" },
   "dependencies": {
-    "codex-bridge": "file:../.."
+    "@ablancodev/codex-bridge": "file:../.."
   }
 }
