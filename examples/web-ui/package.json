@@ -1,0 +1,10 @@
+{
+  "name": "codex-bridge-example-web-ui",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Ejemplo mínimo: chat web multi-turno sobre codex-bridge.",
+  "scripts": { "start": "node server.js" },
+  "dependencies": {
+    "codex-bridge": "file:../.."
+  }
+}

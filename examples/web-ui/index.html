@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>LLM local · Codex CLI</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+  :root { color-scheme: light dark; }
+  body { font: 15px/1.5 -apple-system, system-ui, sans-serif; max-width: 820px; margin: 30px auto; padding: 0 16px; }
+  h1 { font-size: 20px; margin: 0 0 4px; }
+  p.sub { color: #888; margin: 0 0 16px; }
+  .row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-bottom: 12px; font-size: 13px; }
+  .row label { display: inline-flex; align-items: center; gap: 4px; }
+  textarea { width: 100%; min-height: 90px; padding: 10px; font: inherit; box-sizing: border-box; border-radius: 8px; border: 1px solid #8884; }
+  button { padding: 8px 16px; font: inherit; border-radius: 8px; border: 0; background: #0a7; color: #fff; cursor: pointer; }
+  button.ghost { background: transparent; color: inherit; border: 1px solid #8884; }
+  button:disabled { opacity: .5; cursor: wait; }
+  .status { color: #888; font-size: 13px; }
+  #chat { margin-top: 20px; display: flex; flex-direction: column; gap: 12px; }
+  .msg { padding: 12px 14px; border-radius: 10px; white-space: pre-wrap; word-wrap: break-word; }
+  .msg.user { background: #0a71; align-self: flex-end; max-width: 80%; }
+  .msg.bot { background: #8881; align-self: flex-start; max-width: 90%; }
+  .meta { font-size: 11px; color: #888; margin-top: 20px; }
+</style>
+</head>
+<body>
+  <h1>LLM local · Codex CLI</h1>
+  <p class="sub">Conversación multi-turno usando tu suscripción de ChatGPT. Sin API.</p>
+
+  <div class="row" id="mcp-row">
+    <strong>MCPs:</strong>
+    <span id="mcp-list">(cargando)</span>
+    <button class="ghost" id="reset">Nueva conversación</button>
+    <span class="status" id="sid"></span>
+  </div>
+
+  <textarea id="q" placeholder="Escribe tu pregunta… (⌘/Ctrl+Enter para enviar)"></textarea>
+  <div class="row" style="margin-top: 8px;">
+    <button id="send">Enviar</button>
+    <span class="status" id="status"></span>
+  </div>
+
+  <div id="chat"></div>
+  <div class="meta">Los MCPs seleccionados sólo aplican al iniciar una nueva conversación.</div>
+
+<script>
+const q = document.getElementById('q');
+const btn = document.getElementById('send');
+const chat = document.getElementById('chat');
+const status = document.getElementById('status');
+const sidEl = document.getElementById('sid');
+const resetBtn = document.getElementById('reset');
+const mcpListEl = document.getElementById('mcp-list');
+
+let sessionId = null;
+let availableMcps = [];
+
+function render(role, text) {
+  const el = document.createElement('div');
+  el.className = 'msg ' + role;
+  el.textContent = text;
+  chat.appendChild(el);
+  window.scrollTo(0, document.body.scrollHeight);
+}
+
+function selectedMcps() {
+  return [...document.querySelectorAll('input[name=mcp]:checked')].map(i => i.value);
+}
+
+async function loadMcps() {
+  const r = await fetch('/mcps'); const j = await r.json();
+  availableMcps = j.available || [];
+  if (availableMcps.length === 0) {
+    mcpListEl.textContent = '(ninguno configurado — edita MCP_CATALOG en server.js)';
+    return;
+  }
+  mcpListEl.innerHTML = availableMcps.map(n =>
+    `<label><input type="checkbox" name="mcp" value="${n}"> ${n}</label>`).join(' ');
+}
+
+async function ask() {
+  const prompt = q.value.trim();
+  if (!prompt) return;
+  btn.disabled = true; status.textContent = 'Pensando…';
+  render('user', prompt); q.value = '';
+  const t0 = Date.now();
+  try {
+    const r = await fetch('/ask', {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ prompt, sessionId, mcps: sessionId ? undefined : selectedMcps() })
+    });
+    const j = await r.json();
+    if (!r.ok) throw new Error(j.error || r.statusText);
+    render('bot', j.answer);
+    sessionId = j.sessionId;
+    sidEl.textContent = sessionId ? 'sesión: ' + sessionId.slice(0, 8) : '';
+    status.textContent = `${((Date.now()-t0)/1000).toFixed(1)}s`;
+  } catch (e) {
+    render('bot', 'Error: ' + e.message);
+    status.textContent = '';
+  } finally {
+    btn.disabled = false; q.focus();
+  }
+}
+
+resetBtn.addEventListener('click', () => {
+  sessionId = null; sidEl.textContent = ''; chat.innerHTML = ''; status.textContent = 'Nueva conversación'; q.focus();
+});
+btn.addEventListener('click', ask);
+q.addEventListener('keydown', e => { if ((e.metaKey||e.ctrlKey) && e.key === 'Enter') ask(); });
+
+loadMcps();
+</script>
+</body>
+</html>

@@ -1,0 +1,16 @@
+{
+  "name": "codex-bridge",
+  "version": "0.1.0",
+  "description": "Chat con Codex CLI (suscripción ChatGPT, sin API) desde tu app. Multi-turno + MCPs por proyecto.",
+  "main": "index.js",
+  "files": ["index.js", "README.md"],
+  "engines": { "node": ">=18" },
+  "keywords": ["codex", "chatgpt", "llm", "mcp"],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ablancodev/codex-bridge.git"
+  },
+  "homepage": "https://github.com/ablancodev/codex-bridge",
+  "bugs": { "url": "https://github.com/ablancodev/codex-bridge/issues" }
+}
